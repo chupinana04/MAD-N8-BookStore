@@ -1,0 +1,35 @@
+@startuml
+actor "Khách hàng" as User
+participant "CheckoutScreen" as ViewC
+participant "CheckoutViewModel" as VM
+participant "BookStoreApiService" as Model
+
+User -> ViewC: Điền thông tin giao hàng, Chọn Stripe & Click "Đặt hàng"
+activate ViewC
+ViewC -> VM: processCheckout(CheckoutRequest)
+activate VM
+VM -> Model: checkout(CheckoutRequest)
+activate Model
+Model -->> VM: Response(OrderResponse) (orderId, totalPrice, status="Chờ thanh toán")
+deactivate Model
+
+== Luồng cổng thanh toán Stripe ==
+VM -> Model: createStripePaymentIntent(StripePaymentIntentRequest)
+activate Model
+Model -->> VM: Response(StripePaymentIntentResponse) (clientSecret)
+deactivate Model
+VM -->> ViewC: Cung cấp clientSecret cho Stripe SDK
+note over ViewC: Stripe SDK hiển thị Card Input Form
+User -> ViewC: Nhập số thẻ Visa/Mastercard & Xác nhận thanh toán
+note over ViewC: Stripe SDK thực hiện thanh toán trực tiếp
+
+ViewC -> VM: confirmStripePayment(paymentIntentId, orderId)
+VM -> Model: confirmStripePayment(ConfirmStripePaymentRequest)
+activate Model
+Model -->> VM: Response(ApiMessage) (message="Đã thanh toán")
+deactivate Model
+VM -->> ViewC: Cập nhật checkoutState = Success
+ViewC --> User: Chuyển hướng sang màn hình Đặt hàng thành công
+deactivate ViewC
+deactivate VM
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+actor "Khách hàng" as User
+participant "OrderListScreen" as ViewL
+participant "OrderDetailScreen" as ViewD
+participant "OrderViewModel" as VM
+participant "BookStoreApiService" as Model
+
+== Xem danh sách ==
+User -> ViewL: Chọn tab "Đơn hàng"
+activate ViewL
+ViewL -> VM: fetchOrders(customerId, status=null)
+activate VM
+VM -> Model: getOrders(customerId, null)
+activate Model
+Model -->> VM: Response(List(OrderItem))
+deactivate Model
+VM -->> ViewL: Cập nhật list local
+ViewL --> User: Hiển thị danh sách các đơn hàng
+deactivate ViewL
+
+== Xem chi tiết ==
+User -> ViewL: Nhấp chọn một đơn hàng cụ thể
+activate ViewL
+ViewL -> ViewD: Mở màn hình chi tiết đơn hàng
+deactivate ViewL
+
+activate ViewD
+ViewD -> VM: fetchOrderDetail(orderId)
+VM -> Model: getOrderDetail(orderId)
+activate Model
+Model -->> VM: Response(OrderDetailResponse)
+deactivate Model
+VM -->> ViewD: Cập nhật orderDetail State
+ViewD --> User: Hiển thị thông tin vận chuyển, sách mua, tổng tiền
+
+== Hủy đơn hàng (Trạng thái chờ xử lý) ==
+User -> ViewD: Click nút "Hủy đơn hàng" & Xác nhận
+ViewD -> VM: cancelOrder(orderId)
+VM -> Model: cancelOrder(orderId)
+activate Model
+Model -->> VM: Response(ApiMessage)
+deactivate Model
+note over VM: Cập nhật trạng thái đơn hàng cục bộ thành "Đã hủy"
+VM -->> ViewD: Cập nhật State thành công
+ViewD --> User: Cập nhật trạng thái hiển thị thành "Đã hủy" & ẩn nút Hủy
+deactivate ViewD
+deactivate VM
+@enduml

@@ -1,0 +1,64 @@
+Draw an Entity Relationship Diagram (ERD) for the Order Management database schema.
+
+Entities and Attributes:
+
+1. Entity "Order"
+   - orderID: integer (Primary Key)
+   - orderDate: timestamp
+   - totalAmount: decimal
+   - finalAmount: decimal
+   - status: varchar
+   - vnpTransactionNo: varchar
+   - idCustomer: integer (Foreign Key)
+   - idAddress: integer (Foreign Key)
+   - idPayment: integer (Foreign Key)
+   - idShipment: integer (Foreign Key)
+   - idVoucher: integer (Foreign Key)
+
+2. Entity "OrderItem"
+   - orderItemID: integer (Primary Key)
+   - quantity: integer
+   - idOrder: integer (Foreign Key)
+   - idBook: integer (Foreign Key)
+
+3. Entity "Customer"
+   - customerID: integer (Primary Key)
+   - fullName: varchar
+
+4. Entity "Book"
+   - bookID: integer (Primary Key)
+   - title: varchar
+   - price: decimal
+
+5. Entity "Address"
+   - addressID: integer (Primary Key)
+   - receiverName: varchar
+   - addressString: varchar
+
+6. Entity "Payment"
+   - paymentID: integer (Primary Key)
+   - paymentMethod: varchar
+   - status: varchar
+   - vnpToken: varchar
+
+7. Entity "Shipment"
+   - shipmentID: integer (Primary Key)
+   - shipmentMethod: varchar
+   - estimatedDate: varchar
+
+8. Entity "Voucher"
+   - voucherID: integer (Primary Key)
+   - code: varchar
+   - type: varchar
+   - discountValue: decimal
+   - usageLimit: integer
+
+Relationships:
+
+1. One-to-Many relationship from "Customer" to "Order". Foreign key: idCustomer
+2. One-to-Many relationship from "Address" to "Order". Foreign key: idAddress
+3. One-to-Many relationship from "Payment" to "Order". Foreign key: idPayment
+4. One-to-Many relationship from "Shipment" to "Order". Foreign key: idShipment
+5. One-to-Many relationship from "Voucher" to "Order". Foreign key: idVoucher
+6. One-to-Many relationship from "Order" to "OrderItem". Foreign key: idOrder
+7. One-to-Many relationship from "Book" to "OrderItem". Foreign key: idBook

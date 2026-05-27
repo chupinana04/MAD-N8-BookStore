@@ -1,0 +1,45 @@
+Draw a Sequence Diagram for the Order Management feature (View History, View Detail, Cancel Order) of a BookStore Android app using MVVM architecture.
+
+Objects:
+Actor "User"
+Boundary "OrderHistoryScreen"
+Boundary "OrderDetailScreen"
+Control "OrderViewModel"
+Control "BookStoreApiService"
+Control "Backend"
+Entity "Database"
+
+Messages:
+
+1. User to OrderHistoryScreen: Open order history
+2. OrderHistoryScreen to OrderViewModel: loadOrders(status)
+3. OrderViewModel to BookStoreApiService: getOrders(status)
+4. BookStoreApiService to Backend: GET /api/order
+5. Backend to Database: Query orders by customerId
+6. Database to Backend: return orders list
+7. Backend to BookStoreApiService: return List<OrderItem>
+8. BookStoreApiService to OrderViewModel: return Response<List<OrderItem>>
+9. OrderViewModel to OrderHistoryScreen: Update UI with orders list
+
+10. User to OrderHistoryScreen: Click on a specific order
+11. OrderHistoryScreen to OrderDetailScreen: Navigate to OrderDetailScreen
+12. OrderDetailScreen to OrderViewModel: loadOrderDetail(orderId)
+13. OrderViewModel to BookStoreApiService: getOrderDetail(orderId)
+14. BookStoreApiService to Backend: GET /api/order/{id}
+15. Backend to Database: Query full order details
+16. Database to Backend: return order detail data
+17. Backend to BookStoreApiService: return OrderDetailResponse
+18. BookStoreApiService to OrderViewModel: return Response<OrderDetailResponse>
+19. OrderViewModel to OrderDetailScreen: Update UI with order details
+
+opt [User cancels the order]
+20. User to OrderDetailScreen: Click "Hủy đơn hàng" (Cancel order)
+21. OrderDetailScreen to OrderViewModel: cancelOrder(orderId)
+22. OrderViewModel to BookStoreApiService: cancelOrder(orderId)
+23. BookStoreApiService to Backend: PUT /api/order/{id}/cancel
+24. Backend to Database: Update order status to "Đã hủy"
+25. Database to Backend: return success
+26. Backend to BookStoreApiService: return ApiMessage(success)
+27. BookStoreApiService to OrderViewModel: return Response
+28. OrderViewModel to OrderDetailScreen: Show Toast & pop back to History
+end

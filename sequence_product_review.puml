@@ -1,0 +1,40 @@
+@startuml
+actor "Khách hàng" as User
+participant "BookDetailScreen" as ViewD
+participant "WriteReviewScreen" as ViewW
+participant "BookDetailViewModel" as VM
+participant "BookStoreApiService" as Model
+
+== Luồng xem danh sách đánh giá ==
+User -> ViewD: Mở trang chi tiết sách
+activate ViewD
+ViewD -> VM: fetchReviews(bookId)
+activate VM
+VM -> Model: getReviews(bookId)
+activate Model
+Model -->> VM: Response(List(ReviewItem))
+deactivate Model
+VM -->> ViewD: Cập nhật reviewsList local
+ViewD --> User: Hiển thị các đánh giá và số sao trung bình
+deactivate ViewD
+
+== Luồng viết đánh giá mới ==
+User -> ViewD: Bấm nút "Viết đánh giá"
+activate ViewD
+ViewD -> ViewW: Mở màn hình viết đánh giá
+deactivate ViewD
+
+activate ViewW
+User -> ViewW: Chọn 5 sao, nhập nội dung bình luận & Bấm "Gửi"
+ViewW -> VM: submitReview(bookId, 5, "Sách rất hay!")
+note right of VM: Khởi tạo PostReviewRequest(bookId, 5, comment)
+VM -> Model: postReview(PostReviewRequest)
+activate Model
+Model -->> VM: Response(ReviewSubmissionResponse) (success=true)
+deactivate Model
+VM -> VM: fetchReviews(bookId) (tải lại danh sách ngầm)
+VM -->> ViewW: Trả trạng thái thành công
+ViewW --> User: Hiển thị Toast thành công & quay về trang chi tiết
+deactivate ViewW
+deactivate VM
+@enduml

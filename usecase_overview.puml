@@ -1,0 +1,38 @@
+@startuml
+left to right direction
+actor "Khách hàng" as User
+actor "Cổng Stripe" as Stripe
+actor "Cổng PayOS" as PayOS
+
+rectangle "Hệ thống BookStore App" as App {
+    usecase "Xem & Viết Đánh giá" as UC_Review
+    usecase "Xem danh sách đánh giá" as UC_ViewReviews
+    usecase "Gửi đánh giá mới" as UC_PostReview
+    
+    usecase "Thanh toán (Checkout)" as UC_Checkout
+    usecase "Thanh toán khi nhận hàng (COD)" as UC_PayCOD
+    usecase "Thanh toán thẻ (Stripe)" as UC_PayStripe
+    usecase "Thanh toán chuyển khoản QR (PayOS)" as UC_PayPayOS
+    
+    usecase "Quản lý đơn hàng" as UC_OrderManage
+    usecase "Xem danh sách đơn hàng" as UC_ViewOrders
+    usecase "Xem chi tiết đơn hàng" as UC_ViewOrderDetail
+    usecase "Hủy đơn hàng" as UC_CancelOrder
+}
+
+User --> UC_Review
+UC_Review ..> UC_ViewReviews : <<include>>
+UC_PostReview ..> UC_Review : <<extend>>
+
+User --> UC_Checkout
+UC_PayCOD --|> UC_Checkout
+UC_PayStripe --|> UC_Checkout
+UC_PayPayOS --|> UC_Checkout
+UC_PayStripe --> Stripe
+UC_PayPayOS --> PayOS
+
+User --> UC_OrderManage
+UC_OrderManage ..> UC_ViewOrders : <<include>>
+UC_ViewOrderDetail ..> UC_OrderManage : <<extend>>
+UC_CancelOrder ..> UC_OrderManage : <<extend>>
+@enduml

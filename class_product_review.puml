@@ -1,0 +1,147 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+left to right direction
+
+' ============================================================
+'  CLASS DIAGRAM — Chức năng Đánh giá Sản phẩm (Product Review)
+'  Kiến trúc MVVM | BookStore Mobile App
+'  Phản ánh đúng source code thực tế
+' ============================================================
+
+' -------------------- TẦNG VIEW --------------------
+package "ui.screens.product" <<Frame>> #E3F2FD {
+
+    class ProductDetailScreen <<Composable>> {
+        - navController: NavController
+        - cartViewModel: CartViewModel
+        - bookViewModel: BookViewModel
+        + Content()
+    }
+
+    class ReviewListScreen <<Composable>> {
+        - navController: NavController
+        - bookId: Int
+        - bookViewModel: BookViewModel
+        + Content()
+    }
+
+    note bottom of ReviewListScreen
+        Form "Viết đánh giá" hiện dưới dạng
+        AlertDialog inline (không có màn hình
+        WriteReviewScreen riêng)
+    end note
+}
+
+' -------------------- TẦNG VIEWMODEL --------------------
+package "ui.viewmodels" <<Frame>> #FFF3E0 {
+
+    class BookViewModel <<ViewModel>> {
+        - api: BookStoreApiService
+        + bookDetail: MutableState<BookDetailResponse?>
+        + allReviews: MutableState<List<ReviewItem>>
+        + isReviewLoading: MutableState<Boolean>
+        + reviewErrorMessage: MutableState<String?>
+        + canWriteReview: Boolean  {readOnly}
+        --
+        + loadBookDetail(bookId: Int): void
+        + loadAllReviews(bookId: Int): void
+        + postReview(bookId: Int, rating: Int, comment: String, onDone: (Boolean) -> Unit): void
+        + clearReviewError(): void
+    }
+
+    note right of BookViewModel
+        canWriteReview = true khi:
+        TokenManager.token != null
+        && TokenManager.customerId > 0
+    end note
+}
+
+' -------------------- TẦNG API / INFRASTRUCTURE --------------------
+package "data.api" <<Frame>> #E8F5E9 {
+
+    interface BookStoreApiService <<interface>> {
+        + getReviews(bookId: Int): Response<List<ReviewItem>>
+        + postReview(request: PostReviewRequest): Response<ReviewSubmissionResponse>
+        + getBookDetail(bookId: Int): Response<BookDetailResponse>
+    }
+
+    class RetrofitClient <<Singleton>> {
+        + {static} BASE_URL: String
+        - okHttpClient: OkHttpClient
+        + {static} api: BookStoreApiService
+    }
+
+    class TokenManager <<Singleton>> {
+        + {static} token: String?
+        + {static} customerId: Int
+    }
+}
+
+' -------------------- TẦNG DATA MODEL --------------------
+package "data.model" <<Frame>> #F3E5F5 {
+
+    class ReviewItem <<data class>> {
+        + reviewId: Int?
+        + rating: Double
+        + comment: String
+        + customerId: Int?
+        + customer: ReviewCustomer?
+        + createdAt: String?
+    }
+
+    class ReviewCustomer <<data class>> {
+        + fullName: String?
+    }
+
+    class PostReviewRequest <<data class>> {
+        + bookId: Int
+        + rating: Int
+        + comment: String
+    }
+
+    class ReviewSubmissionResponse <<data class>> {
+        + message: String?
+        + updated: Boolean
+        + review: ReviewItem?
+    }
+
+    note bottom of ReviewSubmissionResponse
+        updated = true: Cập nhật review cũ
+        updated = false: Tạo review mới
+        Mỗi customer chỉ có 1 review/book
+    end note
+
+    class BookDetailResponse <<data class>> {
+        + book: Book
+        + avgRating: Double?
+        + totalReviews: Int?
+        + top3Reviews: List<ReviewItem>?
+        + similarSource: String?
+        + similarBooks: List<Book>?
+    }
+}
+
+' ==================== MỐI QUAN HỆ ====================
+
+' --- Association (đường liền) ---
+ProductDetailScreen --> BookViewModel : uses
+ReviewListScreen --> BookViewModel : uses
+BookViewModel --> BookStoreApiService : calls
+
+' --- Aggregation (hình thoi rỗng) ---
+BookViewModel "1" o-- "0..*" ReviewItem : holds allReviews
+BookDetailResponse "1" o-- "0..3" ReviewItem : top3Reviews
+ReviewItem "1" o-- "0..1" ReviewCustomer : customer
+
+' --- Dependency (đường đứt nét) ---
+BookViewModel ..> PostReviewRequest : <<use>>
+BookViewModel ..> ReviewSubmissionResponse : <<use>>
+BookViewModel ..> BookDetailResponse : <<use>>
+BookViewModel ..> TokenManager : <<use>>
+RetrofitClient ..> BookStoreApiService : <<create>>
+
+' --- Composition (ReviewSubmissionResponse chứa ReviewItem) ---
+ReviewSubmissionResponse --> ReviewItem : contains
+
+@enduml

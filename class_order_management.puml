@@ -1,0 +1,57 @@
+@startuml
+class OrderListScreen {
+    - viewModel: OrderViewModel
+    - navController: NavController
+    + Content()
+}
+class OrderDetailScreen {
+    - viewModel: OrderViewModel
+    - navController: NavController
+    + Content()
+}
+class OrderViewModel {
+    - apiService: BookStoreApiService
+    + ordersList: StateFlow<List<OrderItem>>
+    + orderDetail: StateFlow<OrderDetailResponse>
+    + fetchOrders(customerId: Int, status: String?)
+    + fetchOrderDetail(orderId: Int)
+    + cancelOrder(orderId: Int)
+}
+interface BookStoreApiService {
+    + getOrders(customerId: Int, status: String?): Response<List<OrderItem>>
+    + getOrderDetail(orderId: Int): Response<OrderDetailResponse>
+    + cancelOrder(orderId: Int): Response<ApiMessage>
+}
+class OrderItem {
+    + orderId: Int
+    + orderDate: String
+    + totalAmount: Double
+    + status: String
+}
+class OrderDetailResponse {
+    + orderId: Int
+    + receiverName: String
+    + addressString: String
+    + books: List<BookOrderItem>
+    + shippingFee: Double
+    + totalAmount: Double
+    + status: String
+}
+class BookOrderItem {
+    + bookId: Int
+    + title: String
+    + quantity: Int
+    + price: Double
+}
+class ApiMessage {
+    + message: String
+}
+
+OrderListScreen --> OrderViewModel : Association
+OrderDetailScreen --> OrderViewModel : Association
+OrderViewModel --> BookStoreApiService : Association
+OrderViewModel o-- OrderItem : Aggregation
+OrderViewModel ..> OrderDetailResponse : Dependency
+OrderDetailResponse o-- BookOrderItem : Aggregation
+BookStoreApiService ..> ApiMessage : Dependency
+@enduml

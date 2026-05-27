@@ -1,0 +1,25 @@
+@startuml
+actor "Khách hàng" as User
+participant "CheckoutScreen" as ViewC
+participant "CheckoutViewModel" as VM
+participant "BookStoreApiService" as Model
+
+User -> ViewC: Chọn PayOS & Click "Thanh toán"
+activate ViewC
+ViewC -> VM: processCheckout(CheckoutRequest)
+activate VM
+VM -> Model: checkout(CheckoutRequest)
+activate Model
+Model -->> VM: Response(OrderResponse) (orderId, totalPrice, status="Chờ thanh toán")
+deactivate Model
+
+== Luồng PayOS ==
+VM -> Model: createPayOSPaymentLink(PayOSPaymentRequest)
+activate Model
+Model -->> VM: Response(PayOSPaymentResponse) (checkoutUrl)
+deactivate Model
+VM -->> ViewC: Trả về checkoutUrl
+ViewC --> User: Mở trình duyệt/WebView hiển thị mã QR PayOS để quét chuyển khoản
+deactivate ViewC
+deactivate VM
+@enduml

@@ -1,0 +1,66 @@
+@startuml
+class CheckoutScreen {
+    - viewModel: CheckoutViewModel
+    - navController: NavController
+    + Content()
+}
+class CheckoutViewModel {
+    - apiService: BookStoreApiService
+    + checkoutState: StateFlow<CheckoutState>
+    + processCheckout(request: CheckoutRequest)
+    + createStripePayment(amount: Double)
+    + createPayOSLink(orderId: Int)
+}
+interface BookStoreApiService {
+    + checkout(request: CheckoutRequest): Response<OrderResponse>
+    + createStripePaymentIntent(request: StripePaymentIntentRequest): Response<StripePaymentIntentResponse>
+    + confirmStripePayment(request: ConfirmStripePaymentRequest): Response<ApiMessage>
+    + createPayOSPaymentLink(request: PayOSPaymentRequest): Response<PayOSPaymentResponse>
+}
+class CheckoutRequest {
+    + customerId: Int
+    + addressId: Int
+    + paymentMethodId: Int
+    + voucherId: Int?
+}
+class OrderResponse {
+    + orderId: Int
+    + totalPrice: Double
+    + status: String
+}
+class StripePaymentIntentRequest {
+    + amount: Double
+    + currency: String
+}
+class StripePaymentIntentResponse {
+    + clientSecret: String
+    + publishableKey: String
+}
+class ConfirmStripePaymentRequest {
+    + paymentIntentId: String
+    + orderId: Int
+}
+class PayOSPaymentRequest {
+    + orderId: Int
+    + amount: Double
+    + description: String
+}
+class PayOSPaymentResponse {
+    + checkoutUrl: String
+    + paymentLinkId: String
+}
+class ApiMessage {
+    + message: String
+}
+
+CheckoutScreen --> CheckoutViewModel : Association
+CheckoutViewModel --> BookStoreApiService : Association
+CheckoutViewModel ..> CheckoutRequest : Dependency
+CheckoutViewModel ..> OrderResponse : Dependency
+CheckoutViewModel ..> StripePaymentIntentRequest : Dependency
+CheckoutViewModel ..> StripePaymentIntentResponse : Dependency
+CheckoutViewModel ..> ConfirmStripePaymentRequest : Dependency
+CheckoutViewModel ..> PayOSPaymentRequest : Dependency
+CheckoutViewModel ..> PayOSPaymentResponse : Dependency
+BookStoreApiService ..> ApiMessage : Dependency
+@enduml

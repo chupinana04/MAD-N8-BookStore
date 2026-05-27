@@ -1,0 +1,28 @@
+Draw a Sequence Diagram for the Product Review (Submit Review) feature of a BookStore Android app using MVVM architecture.
+
+Objects:
+Actor "User"
+Boundary "ReviewListScreen"
+Control "BookViewModel"
+Control "BookStoreApiService"
+Control "Backend"
+Entity "Database"
+
+Messages:
+
+1. User to ReviewListScreen: Click "Write review" button
+2. ReviewListScreen to ReviewListScreen: Show write dialog (AlertDialog)
+3. User to ReviewListScreen: Input rating and comment, click "Submit"
+4. ReviewListScreen to BookViewModel: postReview(bookId, rating, comment, onDone)
+5. BookViewModel to BookStoreApiService: postReview(PostReviewRequest)
+6. BookStoreApiService to Backend: POST /api/review
+7. Backend to Database: Check if user already reviewed this book
+8. Database to Backend: Return existing review or null
+9. Backend to Database: Insert new review OR Update existing review
+10. Database to Backend: Return success status
+11. Backend to BookStoreApiService: Return ReviewSubmissionResponse
+12. BookStoreApiService to BookViewModel: Return Response<ReviewSubmissionResponse>
+13. BookViewModel to BookViewModel: loadAllReviews(bookId) to refresh list
+14. BookViewModel to ReviewListScreen: Invoke onDone(true) callback
+15. ReviewListScreen to ReviewListScreen: Close dialog (showWriteDialog = false)
+16. ReviewListScreen to User: Show success Toast and updated review list

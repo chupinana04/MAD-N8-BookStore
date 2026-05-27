@@ -1,0 +1,40 @@
+Draw a Class Diagram for the Product Review feature of a BookStore Android app using MVVM architecture.
+
+Classes:
+
+1. Class "ProductDetailScreen" with private attributes: navController of type NavController, bookViewModel of type BookViewModel. Public operation: Content().
+
+2. Class "ReviewListScreen" with private attributes: navController of type NavController, bookId of type Int, bookViewModel of type BookViewModel. Public operation: Content().
+
+3. Class "BookViewModel" with private attribute: api of type BookStoreApiService. Public attributes: allReviews of type List, bookDetail of type BookDetailResponse, isReviewLoading of type Boolean, reviewErrorMessage of type String, canWriteReview of type Boolean. Public operations: loadBookDetail(bookId of type Int) returns void, loadAllReviews(bookId of type Int) returns void, postReview(bookId of type Int, rating of type Int, comment of type String) returns void, clearReviewError() returns void.
+
+4. Interface "BookStoreApiService" with operations: getReviews(bookId of type Int) returns List of ReviewItem, postReview(request of type PostReviewRequest) returns ReviewSubmissionResponse, getBookDetail(bookId of type Int) returns BookDetailResponse.
+
+5. Class "TokenManager" with public static attributes: token of type String, customerId of type Int.
+
+6. Class "ReviewItem" with public attributes: reviewId of type Int, rating of type Double, comment of type String, customerId of type Int, customer of type ReviewCustomer, createdAt of type String.
+
+7. Class "ReviewCustomer" with public attribute: fullName of type String.
+
+8. Class "PostReviewRequest" with public attributes: bookId of type Int, rating of type Int, comment of type String.
+
+9. Class "ReviewSubmissionResponse" with public attributes: message of type String, updated of type Boolean, review of type ReviewItem.
+
+10. Class "BookDetailResponse" with public attributes: book of type Book, avgRating of type Double, totalReviews of type Int, top3Reviews of type List of ReviewItem.
+
+Relationships:
+
+Association from ProductDetailScreen to BookViewModel labeled "uses".
+Association from ReviewListScreen to BookViewModel labeled "uses".
+Association from BookViewModel to BookStoreApiService labeled "calls".
+
+Aggregation from BookViewModel to ReviewItem with multiplicity 0 to many, labeled "holds allReviews".
+Aggregation from BookDetailResponse to ReviewItem with multiplicity 0 to 3, labeled "top3Reviews".
+Aggregation from ReviewItem to ReviewCustomer with multiplicity 0 to 1, labeled "customer".
+
+Dependency from BookViewModel to PostReviewRequest labeled "uses".
+Dependency from BookViewModel to ReviewSubmissionResponse labeled "uses".
+Dependency from BookViewModel to BookDetailResponse labeled "uses".
+Dependency from BookViewModel to TokenManager labeled "uses".
+
+Composition from ReviewSubmissionResponse to ReviewItem labeled "contains".

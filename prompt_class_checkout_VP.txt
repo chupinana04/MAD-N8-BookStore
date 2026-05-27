@@ -1,0 +1,70 @@
+Draw a Class Diagram for the Checkout and Payment feature of a BookStore Android app using MVVM architecture. This feature supports 3 payment methods: COD, Stripe credit card, and PayOS bank transfer via VietQR.
+
+Classes:
+
+1. Class "CheckoutScreen" with private attributes: navController of type NavController, orderViewModel of type OrderViewModel, cartViewModel of type CartViewModel. Public operation: Content().
+
+2. Class "PaymentSelectionScreen" with private attributes: navController of type NavController, orderViewModel of type OrderViewModel. Public operation: Content().
+
+3. Class "AddressSelectionScreen" with private attributes: navController of type NavController, orderViewModel of type OrderViewModel. Public operation: Content().
+
+4. Class "ShipmentSelectionScreen" with private attributes: navController of type NavController, orderViewModel of type OrderViewModel. Public operation: Content().
+
+5. Class "VoucherSelectionScreen" with private attributes: navController of type NavController, totalAmount of type Double, orderViewModel of type OrderViewModel. Public operation: Content().
+
+6. Class "PaymentWebViewScreen" with private attributes: navController of type NavController, url of type String. Public operation: Content().
+
+7. Class "OrderViewModel" with private attribute: api of type BookStoreApiService. Public attributes: selectedAddress of type AddressItem, selectedPayment of type PaymentItem, selectedShipment of type ShipmentItem, selectedVoucher of type VoucherItem, checkoutResult of type OrderResponse, isLoading of type Boolean, message of type String. Public operations: checkout(addressId of type Int, paymentId of type Int, shipmentId of type Int, voucherId of type Int, selectedCartItemIds of type List) returns void, createPaymentIntent(orderId of type Int) returns void, confirmStripePayment(orderId of type Int, paymentIntentId of type String) returns void, createPayOSPaymentLink(orderId of type Int) returns void, loadVouchers() returns void, loadShipments() returns void, validateVoucher(code of type String, totalAmount of type Double) returns void.
+
+8. Class "CartViewModel" with private attribute: api of type BookStoreApiService. Public attributes: cartItems of type List, totalAmount of type Double, isLoading of type Boolean, selectedCartItemIds of type List, selectedTotalPrice of type Double, hasSelectedItems of type Boolean. Public operations: loadCart() returns void, addToCart(bookId of type Int) returns void, updateQuantity(cartItemId of type Int, newQuantity of type Int) returns void, deleteItem(cartItemId of type Int) returns void, toggleSelection(cartItemId of type Int, isSelected of type Boolean) returns void, clearSelection() returns void.
+
+9. Interface "BookStoreApiService" with operations: checkout(request of type CheckoutRequest) returns OrderResponse, createStripePaymentIntent(request of type StripePaymentIntentRequest) returns StripePaymentIntentResponse, confirmStripePayment(request of type ConfirmStripePaymentRequest) returns ApiMessage, createPayOSPaymentLink(request of type PayOSPaymentRequest) returns PayOSPaymentResponse, getVouchers() returns List of VoucherItem, getShipments() returns List of ShipmentItem, validateVoucher(request of type ValidateVoucherRequest) returns ValidateVoucherResponse.
+
+10. Class "CheckoutRequest" with public attributes: customerId of type Int, addressId of type Int, paymentId of type Int, shipmentId of type Int, voucherId of type Int, selectedCartItemIds of type List.
+
+11. Class "OrderResponse" with public attributes: orderId of type Int, message of type String, status of type String, paymentUrl of type String.
+
+12. Class "StripePaymentIntentRequest" with public attributes: orderId of type Int, customerId of type Int.
+
+13. Class "StripePaymentIntentResponse" with public attributes: clientSecret of type String, paymentIntentId of type String, stripeCustomerId of type String, ephemeralKey of type String.
+
+14. Class "ConfirmStripePaymentRequest" with public attributes: orderId of type Int, paymentIntentId of type String.
+
+15. Class "PayOSPaymentRequest" with public attributes: orderId of type Int.
+
+16. Class "PayOSPaymentResponse" with public attributes: message of type String, paymentUrl of type String, orderId of type Int.
+
+17. Class "PaymentItem" with public attributes: paymentId of type Int, paymentMethod of type String, status of type String, isCashOnDelivery of type Boolean, isBankTransfer of type Boolean, isStripeCard of type Boolean.
+
+18. Class "AddressItem" with public attributes: addressId of type Int, receiverName of type String, addressString of type String.
+
+19. Class "ShipmentItem" with public attributes: shipmentId of type Int, shipmentMethod of type String, estimatedDate of type String.
+
+20. Class "VoucherItem" with public attributes: voucherId of type Int, code of type String, description of type String, discountValue of type Double, minOrderValue of type Double.
+
+21. Class "ApiMessage" with public attributes: message of type String.
+
+Relationships:
+
+Association from CheckoutScreen to OrderViewModel labeled "uses".
+Association from CheckoutScreen to CartViewModel labeled "uses".
+Association from PaymentSelectionScreen to OrderViewModel labeled "uses".
+Association from AddressSelectionScreen to OrderViewModel labeled "uses".
+Association from ShipmentSelectionScreen to OrderViewModel labeled "uses".
+Association from VoucherSelectionScreen to OrderViewModel labeled "uses".
+Association from OrderViewModel to BookStoreApiService labeled "calls".
+Association from CartViewModel to BookStoreApiService labeled "calls".
+
+Aggregation from OrderViewModel to AddressItem with multiplicity 0 to 1, labeled "selectedAddress".
+Aggregation from OrderViewModel to PaymentItem with multiplicity 0 to 1, labeled "selectedPayment".
+Aggregation from OrderViewModel to ShipmentItem with multiplicity 0 to 1, labeled "selectedShipment".
+Aggregation from OrderViewModel to VoucherItem with multiplicity 0 to 1, labeled "selectedVoucher".
+
+Dependency from OrderViewModel to CheckoutRequest labeled "creates".
+Dependency from OrderViewModel to OrderResponse labeled "receives".
+Dependency from OrderViewModel to StripePaymentIntentRequest labeled "creates".
+Dependency from OrderViewModel to StripePaymentIntentResponse labeled "receives".
+Dependency from OrderViewModel to ConfirmStripePaymentRequest labeled "creates".
+Dependency from OrderViewModel to PayOSPaymentRequest labeled "creates".
+Dependency from OrderViewModel to PayOSPaymentResponse labeled "receives".
+Dependency from CheckoutScreen to PaymentWebViewScreen labeled "navigates".

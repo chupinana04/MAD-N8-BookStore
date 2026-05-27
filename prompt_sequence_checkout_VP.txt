@@ -1,0 +1,49 @@
+Draw a Sequence Diagram for the Checkout and Payment feature of a BookStore Android app using MVVM architecture.
+
+Objects:
+Actor "User"
+Boundary "CheckoutScreen"
+Control "OrderViewModel"
+Control "BookStoreApiService"
+Control "Backend"
+Entity "Database"
+
+Messages:
+
+1. User to CheckoutScreen: Click "Thanh toán" (Checkout)
+2. CheckoutScreen to OrderViewModel: checkout(addressId, paymentId, shipmentId, voucherId, cartItems)
+3. OrderViewModel to BookStoreApiService: checkout(CheckoutRequest)
+4. BookStoreApiService to Backend: POST /api/order/checkout
+5. Backend to Database: Validate Payment, Fetch Cart, Apply Voucher
+6. Database to Backend: return validated data
+7. Backend to Database: Insert Order, Insert OrderItems, Delete CartItems
+8. Database to Backend: return transaction success
+9. Backend to BookStoreApiService: return OrderResponse(orderId)
+10. BookStoreApiService to OrderViewModel: return Response<OrderResponse>
+
+alt [Payment method is Stripe Card]
+11. OrderViewModel to BookStoreApiService: createStripePaymentIntent(orderId)
+12. BookStoreApiService to Backend: POST /api/stripe/intent
+13. Backend to BookStoreApiService: return StripePaymentIntentResponse(clientSecret)
+14. BookStoreApiService to OrderViewModel: return Response
+15. OrderViewModel to CheckoutScreen: Show PaymentSheet SDK
+16. User to CheckoutScreen: Input card details and confirm
+17. CheckoutScreen to OrderViewModel: confirmStripePayment(orderId, paymentIntentId)
+18. OrderViewModel to BookStoreApiService: confirmStripePayment(...)
+19. BookStoreApiService to Backend: POST /api/stripe/confirm
+20. Backend to BookStoreApiService: return ApiMessage(success)
+21. BookStoreApiService to OrderViewModel: return Response
+22. OrderViewModel to CheckoutScreen: Navigate to OrderHistory
+
+else [Payment method is Bank Transfer (PayOS)]
+23. OrderViewModel to BookStoreApiService: createPayOSPaymentLink(orderId)
+24. BookStoreApiService to Backend: POST /api/payos/create
+25. Backend to BookStoreApiService: return PayOSPaymentResponse(paymentUrl)
+26. BookStoreApiService to OrderViewModel: return Response
+27. OrderViewModel to CheckoutScreen: Navigate to PaymentWebViewScreen(paymentUrl)
+28. CheckoutScreen to User: Show VietQR for scanning
+
+else [Payment method is COD]
+29. OrderViewModel to CheckoutScreen: Navigate to OrderHistory
+30. CheckoutScreen to User: Show success message
+end
